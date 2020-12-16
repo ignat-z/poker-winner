@@ -1,5 +1,5 @@
 module MonotonicSequence
-  refine Enumerable do
+  refine Array do
     def monotonic_sequence?(step = 1)
       sort.each_cons(2).all? { |(prev_rank, next_rank)| next_rank - prev_rank == step }
     end
@@ -90,8 +90,8 @@ class Rules
       FULL_HOUSE,
       FLUSH,
       STRAIGHT,
-      TWO_PAIRS,
       THREE_OF_A_KIND,
+      TWO_PAIRS,
       PAIR,
       HIGHCARD
     ].reverse.map.with_index { |checker, priority|
@@ -121,7 +121,11 @@ class Hand
   end
 
   def cost
-    Rules.hand_result(@cards).max { cost_compare(_1, _2) }
+    all_costs.max { cost_compare(_1, _2) }
+  end
+
+  def all_costs
+    Rules.hand_result(@cards)
   end
 
   def <=>(other)
@@ -134,20 +138,21 @@ class Hand
   def cost_compare(cost1, cost2)
     return cost1.first <=> cost2.first if (cost1.first <=> cost2.first) != 0
 
-    non_eqaul = cost1.drop(1).zip(cost2.drop(1)).map { _1 <=> _2 }.first { _1 != 0 }
+    non_eqaul = cost1.drop(1).zip(cost2.drop(1)).map { _1 <=> _2 }.find { _1 != 0 }
     non_eqaul || 0
   end
 
   def pp
     desc = "Hand[#{cards.map(&:to_s).join(" ")}"
     desc += if cards.length == 5
-      " -- #{Rules::NAMES[cost.first]}]"
+      " -- #{Rules::NAMES.reverse[cost.first]}]"
     else
       "]"
     end
 
     desc
   end
+  alias_method :inspect, :pp
 end
 
 class Player
@@ -161,11 +166,11 @@ class Player
   end
 
   def top_hand
-    possible_hands.map { Hand.new(_1) }.max
+    possible_hands.max
   end
 
   def possible_hands
-    (board + hand.cards).combination(5).to_a
+    (board + hand.cards).combination(5).to_a.map { Hand.new(_1) }
   end
 
   def <=>(other)
@@ -215,17 +220,22 @@ class Game
     @players = hands.map { Player.new(_1, @board) }
   end
 
-  def sort
+  def order
     return [] unless rules == TexasHoldem
-    players.sort
+    to_ordered_line(players.sort)
+  end
+
+  def to_ordered_line(list)
+    [nil, *list, nil].each_cons(3).map { |before, current, after|
+      next([current.hand.cards.map(&:to_s).join, after.hand.cards.map(&:to_s).join].join("=")) if (current && after) && current == after
+      next(nil) if current && before && current == before
+      current.hand.cards.map(&:to_s).join
+    }.compact
   end
 end
 
-puts ARGF
+ARGF
   .map { _1.delete("\n") }
   .map { _1.split(" ") }
-  .map { Game.new(_1).sort }
-  .map {  _1.map { |result|
-      result.hand.cards.map(&:to_s).join
-    }.join(' ')
-  }
+  .map { Game.new(_1).order }
+  .map { puts _1.join(" ") }
