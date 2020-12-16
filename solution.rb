@@ -3,51 +3,9 @@ require "./lib/hand_printer"
 require "./lib/hand_values_collection"
 require "./lib/ordered_sequence_formatter"
 
-class TexasHoldem
-  def initialize(hands)
-    @board, *@hands = hands
-    @board = @board.chars.each_slice(2).map(&Card.method(:new))
-  end
-
-  def players
-    @hands.map { Player.new(_1, self) }
-  end
-
-  def possible_hands(hand)
-    (@board + hand.cards).combination(5).to_a.map { Hand.new(_1) }
-  end
-end
-
-class OmahaHoldem
-  def initialize(hands)
-    @board, *@hands = hands
-    @board = @board.chars.each_slice(2).map(&Card.method(:new))
-  end
-
-  def players
-    @hands.map { Player.new(_1, self) }
-  end
-
-  def possible_hands(hand)
-    @board.combination(3).to_a
-      .product(hand.cards.combination(2).to_a)
-      .map(&:flatten).map { Hand.new(_1) }
-  end
-end
-
-class FiveCardDraw
-  def initialize(hands)
-    @hands = hands
-  end
-
-  def players
-    @hands.map { Player.new(_1, self) }
-  end
-
-  def possible_hands(hand)
-    [hand]
-  end
-end
+require "./lib/rules/five_card_draw"
+require "./lib/rules/omaha_holdem"
+require "./lib/rules/texas_holdem"
 
 class Hand
   include Comparable
