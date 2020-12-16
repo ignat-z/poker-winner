@@ -1,3 +1,5 @@
+$stdout.sync = true
+
 require "./lib/ordered_sequence_formatter"
 
 require "./lib/rules/five_card_draw"
@@ -37,6 +39,7 @@ rescue Game::UnsupportedFormat => e
 end
 
 ARGF
+  .lazy
   .map { _1.delete("\n") }
   .map { _1.split(" ") }
   .map { parse_line(_1) }
