@@ -19,7 +19,7 @@ describe ResultVectorsComparator do
     let(:vector2) { [1, 2, 3, 1, 1] }
 
     it "returns -1" do
-      assert_equal -1, subject.compare
+      assert_equal(-1, subject.compare)
     end
   end
 
