@@ -1,3 +1,6 @@
+require "./lib/card"
+require "./lib/player"
+
 module Rules
   class OmahaHoldem
     def initialize(hands)

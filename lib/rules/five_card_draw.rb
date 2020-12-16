@@ -1,3 +1,5 @@
+require "./lib/player"
+
 module Rules
   class FiveCardDraw
     def initialize(hands)
