@@ -2,6 +2,7 @@ require "./lib/card"
 require "./lib/hand_printer"
 require "./lib/hand_values_collection"
 require "./lib/ordered_sequence_formatter"
+require "./lib/result_vectors_comparator"
 
 require "./lib/rules/five_card_draw"
 require "./lib/rules/omaha_holdem"
@@ -21,7 +22,7 @@ class Hand
   end
 
   def cost
-    all_costs.max { cost_compare(_1, _2) }
+    all_costs.max { ResultVectorsComparator.new(_1, _2).compare }
   end
 
   def all_costs
@@ -29,20 +30,10 @@ class Hand
   end
 
   def <=>(other)
-    cost1 = cost
-    cost2 = other.cost
-
-    cost_compare(cost1, cost2)
+    ResultVectorsComparator.new(cost, other.cost).compare
   end
 
   private
-
-  def cost_compare(cost1, cost2)
-    return cost1.first <=> cost2.first if (cost1.first <=> cost2.first) != 0
-
-    non_eqaul = cost1.drop(1).zip(cost2.drop(1)).map { _1 <=> _2 }.find { _1 != 0 }
-    non_eqaul || 0
-  end
 
   def pretty_print
     HandPrinter.new(self).print
@@ -65,10 +56,7 @@ class Player
   end
 
   def <=>(other)
-    cost1 = top_hand
-    cost2 = other.top_hand
-
-    cost1 <=> cost2
+    top_hand <=> other.top_hand
   end
 end
 
