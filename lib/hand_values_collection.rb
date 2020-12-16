@@ -76,19 +76,21 @@ class HandValuesCollection
     hand.map(&:cost).sort.reverse
   }
 
+  RULES = [
+    ROYAL_FLUSH,
+    STRAIGHT_FLUSH,
+    FOUR_OF_A_KIND,
+    FULL_HOUSE,
+    FLUSH,
+    STRAIGHT,
+    THREE_OF_A_KIND,
+    TWO_PAIRS,
+    PAIR,
+    HIGHCARD
+  ]
+
   def self.for(hand)
-    [
-      ROYAL_FLUSH,
-      STRAIGHT_FLUSH,
-      FOUR_OF_A_KIND,
-      FULL_HOUSE,
-      FLUSH,
-      STRAIGHT,
-      THREE_OF_A_KIND,
-      TWO_PAIRS,
-      PAIR,
-      HIGHCARD
-    ].map.with_index { |checker, priority|
+    RULES.map.with_index { |checker, priority|
       result = checker.call(hand)
       break([[NAMES.length - priority - 1] + result]) if result
     }

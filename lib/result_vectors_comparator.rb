@@ -6,6 +6,7 @@ class ResultVectorsComparator
 
   def compare
     @vector1
+      .lazy
       .zip(@vector2)
       .map { _1 <=> _2 }
       .find(-> { 0 }) { _1 != 0 }

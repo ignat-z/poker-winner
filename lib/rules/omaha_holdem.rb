@@ -16,7 +16,7 @@ module Rules
     def possible_hands(hand)
       @board.combination(3).to_a
         .product(hand.cards.combination(2).to_a)
-        .map(&:flatten).map { Hand.new(_1) }
+        .map { Hand.new(_1.flatten) }
     end
   end
 end

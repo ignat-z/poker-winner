@@ -13,6 +13,6 @@ class Card
   end
 
   def cost
-    RANKS.index(@rank)
+    @_cost ||= RANKS.index(@rank)
   end
 end

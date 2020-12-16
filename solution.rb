@@ -1,5 +1,3 @@
-$stdout.sync = true
-
 require "./lib/ordered_sequence_formatter"
 
 require "./lib/rules/five_card_draw"
