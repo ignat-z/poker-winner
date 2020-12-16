@@ -1,6 +1,7 @@
-require './lib/rules'
-require './lib/card'
-require './lib/ordered_sequence_formatter'
+require "./lib/rules"
+require "./lib/card"
+require "./lib/ordered_sequence_formatter"
+require "./lib/hand_printer"
 
 class TexasHoldem
   def initialize(hands)
@@ -28,7 +29,9 @@ class OmahaHoldem
   end
 
   def possible_hands(hand)
-    @board.combination(3).to_a.product(hand.cards.combination(2).to_a).map(&:flatten).map { Hand.new(_1) }
+    @board.combination(3).to_a
+      .product(hand.cards.combination(2).to_a)
+      .map(&:flatten).map { Hand.new(_1) }
   end
 end
 
@@ -74,6 +77,8 @@ class Hand
     cost_compare(cost1, cost2)
   end
 
+  private
+
   def cost_compare(cost1, cost2)
     return cost1.first <=> cost2.first if (cost1.first <=> cost2.first) != 0
 
@@ -81,17 +86,10 @@ class Hand
     non_eqaul || 0
   end
 
-  def pp
-    desc = "Hand[#{cards.map(&:to_s).join(" ")}"
-    desc += if cards.length == 5
-      " -- #{Rules::NAMES.reverse[cost.first]}]"
-    else
-      "]"
-    end
-
-    desc
+  def pretty_print
+    HandPrinter.new(self).print
   end
-  alias_method :inspect, :pp
+  alias_method :inspect, :pretty_print
 end
 
 class Player
@@ -105,11 +103,7 @@ class Player
   end
 
   def top_hand
-    possible_hands.max
-  end
-
-  def possible_hands
-    @game.possible_hands(hand)
+    @game.possible_hands(hand).max
   end
 
   def <=>(other)

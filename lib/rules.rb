@@ -1,4 +1,4 @@
-require './lib/monotonic_sequence'
+require "./lib/monotonic_sequence"
 
 class Rules
   using MonotonicSequence
