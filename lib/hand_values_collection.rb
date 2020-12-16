@@ -88,9 +88,9 @@ class HandValuesCollection
       TWO_PAIRS,
       PAIR,
       HIGHCARD
-    ].reverse.map.with_index { |checker, priority|
+    ].map.with_index { |checker, priority|
       result = checker.call(hand)
-      result ? [priority] + result : nil
-    }.compact
+      break([[NAMES.length - priority - 1] + result]) if result
+    }
   end
 end
