@@ -4,7 +4,7 @@ class OrderedSequenceFormatter
   end
 
   def format(&formatter)
-    formatter ||= ->(x) { x }
+    formatter ||= ->(x) { x.to_s }
 
     [nil, *@list, nil].each_cons(3).map { |before, current, after|
       next([formatter.call(current), formatter.call(after)].join("=")) if after && current == after

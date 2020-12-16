@@ -115,6 +115,8 @@ class Player
 end
 
 class Game
+  UnsupportedFormat = Class.new(StandardError)
+
   RULES_CODES = {
     "texas-holdem" => TexasHoldem,
     "omaha-holdem" => OmahaHoldem,
@@ -126,7 +128,7 @@ class Game
   def initialize(description)
     rule_name, *hands = description
     @rules = RULES_CODES.fetch(rule_name) {
-      raise "Error: Unrecognized game type"
+      raise UnsupportedFormat.new("Error: Unrecognized game type")
     }
     @players = @rules.new(hands).players
   end
@@ -138,8 +140,14 @@ class Game
   end
 end
 
+def parse_line(line)
+  Game.new(line).order.join(" ")
+rescue Game::UnsupportedFormat => e
+  [e.message]
+end
+
 ARGF
   .map { _1.delete("\n") }
   .map { _1.split(" ") }
-  .map { Game.new(_1).order }
-  .map { puts _1.join(" ") }
+  .map { parse_line(_1) }
+  .each { puts _1 }
