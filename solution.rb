@@ -64,9 +64,9 @@ class Game
   UnsupportedFormat = Class.new(StandardError)
 
   RULES_CODES = {
-    "texas-holdem" => TexasHoldem,
-    "omaha-holdem" => OmahaHoldem,
-    "five-card-draw" => FiveCardDraw
+    "texas-holdem" => Rules::TexasHoldem,
+    "omaha-holdem" => Rules::OmahaHoldem,
+    "five-card-draw" => Rules::FiveCardDraw
   }
 
   attr_reader :players, :rules
