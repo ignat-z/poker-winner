@@ -2,11 +2,49 @@ require './lib/rules'
 require './lib/card'
 require './lib/ordered_sequence_formatter'
 
-class TexasHoldem; end
+class TexasHoldem
+  def initialize(hands)
+    @board, *@hands = hands
+    @board = @board.chars.each_slice(2).map(&Card.method(:new))
+  end
 
-class OmahaHoldem; end
+  def players
+    @hands.map { Player.new(_1, self) }
+  end
 
-class FiveCardDraw; end
+  def possible_hands(hand)
+    (@board + hand.cards).combination(5).to_a.map { Hand.new(_1) }
+  end
+end
+
+class OmahaHoldem
+  def initialize(hands)
+    @board, *@hands = hands
+    @board = @board.chars.each_slice(2).map(&Card.method(:new))
+  end
+
+  def players
+    @hands.map { Player.new(_1, self) }
+  end
+
+  def possible_hands(hand)
+    @board.combination(3).to_a.product(hand.cards.combination(2).to_a).map(&:flatten).map { Hand.new(_1) }
+  end
+end
+
+class FiveCardDraw
+  def initialize(hands)
+    @hands = hands
+  end
+
+  def players
+    @hands.map { Player.new(_1, self) }
+  end
+
+  def possible_hands(hand)
+    [hand]
+  end
+end
 
 class Hand
   include Comparable
@@ -59,11 +97,11 @@ end
 class Player
   include Comparable
 
-  attr_reader :board, :hand
+  attr_reader :board, :hand, :game
 
-  def initialize(hand, board)
+  def initialize(hand, game)
     @hand = Hand.by_description(hand)
-    @board = board
+    @game = game
   end
 
   def top_hand
@@ -71,7 +109,7 @@ class Player
   end
 
   def possible_hands
-    (board + hand.cards).combination(5).to_a.map { Hand.new(_1) }
+    @game.possible_hands(hand)
   end
 
   def <=>(other)
@@ -89,17 +127,17 @@ class Game
     "five-card-draw" => FiveCardDraw
   }
 
-  attr_reader :board, :players, :rules
+  attr_reader :players, :rules
 
   def initialize(description)
-    rule_name, board, *hands = description
-    @rules = RULES_CODES.fetch(rule_name)
-    @board = board.chars.each_slice(2).map(&Card.method(:new))
-    @players = hands.map { Player.new(_1, @board) }
+    rule_name, *hands = description
+    @rules = RULES_CODES.fetch(rule_name) {
+      raise "Error: Unrecognized game type"
+    }
+    @players = @rules.new(hands).players
   end
 
   def order
-    return [] unless rules == TexasHoldem
     OrderedSequenceFormatter.new(players.sort).format { |player|
       player.hand.cards.map(&:to_s).join
     }
