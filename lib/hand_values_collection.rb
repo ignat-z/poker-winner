@@ -23,11 +23,11 @@ class HandValuesCollection
 
   STRAIGHT_FLUSH = ->(hand) {
     return unless hand.map(&:suit).uniq.count == 1 && hand.map(&:cost).monotonic_sequence?
-    [hand.map(&:rank).max]
+    [hand.map(&:cost).max]
   }
 
   FOUR_OF_A_KIND = ->(hand) {
-    return unless hand.map(&:rank).tally.values.any? {_1 == 4 }
+    return unless hand.map(&:rank).tally.values.any? { _1 == 4 }
     hand.map(&:cost).tally.sort_by { |(rank, count)| -count }.map(&:first)
   }
 
@@ -52,7 +52,7 @@ class HandValuesCollection
   }
 
   TWO_PAIRS = ->(hand) {
-    return unless hand.map(&:rank).tally.values.select { _1 == 2 }.count == 2
+    return unless hand.map(&:rank).tally.values.count { _1 == 2 } == 2
     hand.map(&:cost).tally
       .sort_by { |(rank, count)| -count }
       .each_slice(2)

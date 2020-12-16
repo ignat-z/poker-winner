@@ -2,6 +2,14 @@ require "minitest/autorun"
 
 require "./lib/ordered_sequence_formatter"
 
+MyNumber = Struct.new(:value, :name) {
+  include Comparable
+
+  def <=>(other)
+    value <=> other.value
+  end
+}
+
 describe OrderedSequenceFormatter do
   subject { OrderedSequenceFormatter.new(list) }
 
@@ -23,7 +31,7 @@ describe OrderedSequenceFormatter do
 
   describe "with passed formatter" do
     let(:list) { [1, 2, 3, 4, 5] }
-    let(:formatter) { ->(i) { ('A'..'Z').to_a[i] } }
+    let(:formatter) { ->(i) { ("A".."Z").to_a[i] } }
 
     it "applies it to each value" do
       assert_equal %w[B C D E F], subject.format(&formatter)
@@ -31,19 +39,11 @@ describe OrderedSequenceFormatter do
   end
 
   describe "in case of the same values but different formats" do
-    MyNumber = Struct.new(:value, :name) do
-      include Comparable
-
-      def <=>(number2)
-        value <=> number2.value
-      end
-    end
-
     let(:list) do
       [
-        MyNumber.new(1, 'one'),
-        MyNumber.new(2, 'two'),
-        MyNumber.new(2, 'dos')
+        MyNumber.new(1, "one"),
+        MyNumber.new(2, "two"),
+        MyNumber.new(2, "dos")
       ]
     end
     let(:formatter) { ->(i) { i.name } }
@@ -53,4 +53,3 @@ describe OrderedSequenceFormatter do
     end
   end
 end
-

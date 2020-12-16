@@ -32,4 +32,3 @@ describe ResultVectorsComparator do
     end
   end
 end
-

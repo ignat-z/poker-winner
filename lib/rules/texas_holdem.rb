@@ -13,8 +13,7 @@ module Rules
     end
 
     def possible_hands(hand)
-      (@board + hand.cards).combination(5).to_a
-        .map { Hand.new(_1) }
+      (@board + hand.cards).combination(5).to_a.map { Hand.new(_1) }
     end
   end
 end

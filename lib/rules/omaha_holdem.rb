@@ -1,4 +1,5 @@
 require "./lib/card"
+require "./lib/hand"
 require "./lib/player"
 
 module Rules
