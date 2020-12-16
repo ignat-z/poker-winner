@@ -1,7 +1,7 @@
-require "./lib/rules"
 require "./lib/card"
-require "./lib/ordered_sequence_formatter"
 require "./lib/hand_printer"
+require "./lib/hand_values_collection"
+require "./lib/ordered_sequence_formatter"
 
 class TexasHoldem
   def initialize(hands)
@@ -67,7 +67,7 @@ class Hand
   end
 
   def all_costs
-    Rules.hand_result(@cards)
+    HandValuesCollection.for(@cards)
   end
 
   def <=>(other)

@@ -1,6 +1,6 @@
 require "./lib/monotonic_sequence"
 
-class Rules
+class HandValuesCollection
   using MonotonicSequence
 
   NAMES = [
@@ -76,7 +76,7 @@ class Rules
     hand.map(&:cost).sort.reverse
   }
 
-  def self.hand_result(hand)
+  def self.for(hand)
     [
       ROYAL_FLUSH,
       STRAIGHT_FLUSH,
