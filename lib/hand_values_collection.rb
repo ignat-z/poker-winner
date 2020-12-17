@@ -17,12 +17,12 @@ class HandValuesCollection
   ]
 
   ROYAL_FLUSH = ->(hand) {
-    return unless hand.map(&:suit).uniq.one? && hand.map(&:rank).sort == %w[A J K Q T]
+    return unless hand.uniq(&:suit).one? && hand.map(&:rank).sort == %w[A J K Q T]
     []
   }
 
   STRAIGHT_FLUSH = ->(hand) {
-    return unless hand.map(&:suit).uniq.count == 1 && hand.map(&:cost).monotonic_sequence?
+    return unless hand.uniq(&:suit).one? && hand.map(&:cost).monotonic_sequence?
     [hand.map(&:cost).max]
   }
 
@@ -37,7 +37,7 @@ class HandValuesCollection
   }
 
   FLUSH = ->(hand) {
-    return unless hand.map(&:suit).uniq.count == 1
+    return unless hand.uniq(&:suit).one?
     hand.map(&:cost).sort.reverse
   }
 
