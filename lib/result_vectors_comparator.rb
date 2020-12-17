@@ -1,4 +1,6 @@
 class ResultVectorsComparator
+  EQUAL_VECTOR_FALLBACK = -> { [0, 0] }
+
   def initialize(vector1, vector2)
     @vector1 = vector1
     @vector2 = vector2
@@ -6,9 +8,8 @@ class ResultVectorsComparator
 
   def compare
     @vector1
-      .lazy
       .zip(@vector2)
-      .map { _1 <=> _2 }
-      .find(-> { 0 }) { _1 != 0 }
+      .find(EQUAL_VECTOR_FALLBACK) { (_1 <=> _2) != 0 }
+      .inject(&:<=>)
   end
 end
