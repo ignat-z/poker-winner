@@ -16,8 +16,13 @@ class HandValuesCollection
     "HIGHCARD"
   ]
 
+  ROYAL_RANKS = %w[A J K Q T].freeze
+  HIGH_ACE_RANK = 12
+  LOW_ACE_RANK = -1
+  COUNT_DESC = -> (description) { -description.last }
+
   ROYAL_FLUSH = ->(hand) {
-    return unless hand.uniq(&:suit).one? && hand.map(&:rank).sort == %w[A J K Q T]
+    return unless hand.uniq(&:suit).one? && hand.map(&:rank).sort == ROYAL_RANKS
     []
   }
 
@@ -28,12 +33,12 @@ class HandValuesCollection
 
   FOUR_OF_A_KIND = ->(hand) {
     return unless hand.map(&:rank).tally.values.any? { _1 == 4 }
-    hand.map(&:cost).tally.sort_by { |(rank, count)| -count }.map(&:first)
+    hand.map(&:cost).tally.sort_by(&COUNT_DESC).map(&:first)
   }
 
   FULL_HOUSE = ->(hand) {
     return unless THREE_OF_A_KIND.call(hand) && PAIR.call(hand)
-    hand.map(&:cost).tally.sort_by { |(rank, count)| -count }.map(&:first)
+    hand.map(&:cost).tally.sort_by(&COUNT_DESC).map(&:first)
   }
 
   FLUSH = ->(hand) {
@@ -43,18 +48,18 @@ class HandValuesCollection
 
   STRAIGHT = ->(hand) {
     default_cost = hand.map(&:cost)
-    low_ace_cost = hand.map(&:rank).any? { _1 == "A" } ?
-      hand.map(&:cost).reject.with_index { |rank, index| index == hand.map(&:rank).index("A") } + [-1] # change only one A to -1
+    low_ace_cost = default_cost.any? { _1 == HIGH_ACE_RANK } ?
+      default_cost.reject.with_index { |rank, index| index == default_cost.index(HIGH_ACE_RANK) } + [LOW_ACE_RANK] # change only one A to -1
       : default_cost
 
-    return unless [default_cost.monotonic_sequence?, low_ace_cost.monotonic_sequence?].any?
+    return if !default_cost.monotonic_sequence? && !low_ace_cost.monotonic_sequence?
     (default_cost.monotonic_sequence? ? default_cost : low_ace_cost).sort.reverse
   }
 
   TWO_PAIRS = ->(hand) {
     return unless hand.map(&:rank).tally.values.count { _1 == 2 } == 2
     hand.map(&:cost).tally
-      .sort_by { |(rank, count)| -count }
+      .sort_by(&COUNT_DESC)
       .each_slice(2)
       .flat_map { _1.sort.reverse }
       .map(&:first)
@@ -62,13 +67,13 @@ class HandValuesCollection
 
   THREE_OF_A_KIND = ->(hand) {
     return unless hand.map(&:rank).tally.values.one? { _1 == 3 }
-    top_cost = hand.map(&:cost).tally.min_by { |(rank, count)| -count }.first
+    top_cost = hand.map(&:cost).tally.max_by(&:last).first
     [top_cost, *hand.map(&:cost).reject { _1 == top_cost }.sort.reverse]
   }
 
   PAIR = ->(hand) {
     return unless hand.map(&:rank).tally.values.one? { _1 == 2 }
-    top_cost = hand.map(&:cost).tally.min_by { |(rank, count)| -count }.first
+    top_cost = hand.map(&:cost).tally.max_by(&:last).first
     [top_cost, *hand.map(&:cost).reject { _1 == top_cost }.sort.reverse]
   }
 

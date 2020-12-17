@@ -27,6 +27,4 @@ class Hand
   def pretty_print
     HandPrinter.new(self).print
   end
-
-  alias_method :inspect, :pretty_print
 end
