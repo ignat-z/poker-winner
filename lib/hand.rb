@@ -17,7 +17,7 @@ class Hand
   end
 
   def cost
-    all_costs.max { ResultVectorsComparator.new(_1, _2).compare }
+    @_cost ||= HandValuesCollection.for(@cards)
   end
 
   def <=>(other)
@@ -29,10 +29,4 @@ class Hand
   end
 
   alias_method :inspect, :pretty_print
-
-  private
-
-  def all_costs
-    HandValuesCollection.for(@cards)
-  end
 end

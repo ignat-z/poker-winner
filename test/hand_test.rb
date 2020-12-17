@@ -17,7 +17,7 @@ describe Hand do
   end
 
   describe "cost" do
-    let(:all_costs) { [[1, 2, 3], [2, 3]] }
+    let(:all_costs) { [2, 3] }
 
     it "returns max possible costs of a card" do
       HandValuesCollection.stub(:for, all_costs) do

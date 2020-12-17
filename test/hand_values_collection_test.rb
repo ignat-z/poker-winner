@@ -139,9 +139,7 @@ describe HandValuesCollection do
   describe "for" do
     it "calculates the first possible ranks for passed card" do
       assert_equal(
-        [
-          [9] # ROYAL_FLUSH
-        ],
+        [9], # ROYAL_FLUSH
         HandValuesCollection.for(cards("TcAcQcJcKc"))
       )
     end

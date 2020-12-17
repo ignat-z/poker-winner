@@ -87,12 +87,12 @@ class HandValuesCollection
     TWO_PAIRS,
     PAIR,
     HIGHCARD
-  ]
+  ].freeze
 
   def self.for(hand)
-    RULES.map.with_index { |checker, priority|
+    RULES.each_with_index { |checker, priority|
       result = checker.call(hand)
-      break([[NAMES.length - priority - 1] + result]) if result
+      break([NAMES.length - priority - 1] + result) if result
     }
   end
 end

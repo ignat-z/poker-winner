@@ -11,7 +11,7 @@ class Player
   end
 
   def top_hand
-    @game.possible_hands(hand).max
+    @_top_hand ||= @game.possible_hands(hand).max
   end
 
   def <=>(other)
