@@ -21,6 +21,14 @@ describe OrderedSequenceFormatter do
     end
   end
 
+  describe "with an ordered list wit consiquence duplicates" do
+    let(:list) { [1, 2, 3, 3, 3, 4, 5] }
+
+    it "shows it as is" do
+      assert_equal %w[1 2 3=3=3 4 5], subject.format
+    end
+  end
+
   describe "with an ordered list with duplicates" do
     let(:list) { [1, 2, 3, 3, 5] }
 
