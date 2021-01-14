@@ -1,32 +1,24 @@
 class OrderedSequenceFormatter
+  DEFAULT_FORMATTER = ->(x) { x.to_s }
+
   def initialize(list)
     @list = list
   end
 
   def format(&formatter)
-    formatter ||= ->(x) { x.to_s }
+    formatter ||= DEFAULT_FORMATTER
 
     [nil, *@list, nil].each_cons(3).inject([[], []]) { |(result, stack), (before, current, after)|
-      iteration = if !stack.empty?
-        if !after || current != after
-
-          joined = (stack + [current]).compact.map { |it| formatter.call(it) }.sort.join('=')
-          stack = []
-          joined
-        else
-          stack << current
-          nil
-        end
-      elsif after && current == after
-        stack << current
-        nil
+      if !stack.empty? && (!after || current != after)
+        joined = (stack + [current]).map { |it| formatter.call(it) }.sort.join('=')
+        [result + [joined], []]
+      elsif !stack.empty? || after && current == after
+        [result, stack + [current]]
       elsif before && current == before
-        nil
+        [result, stack]
       else
-        formatter.call(current)
+        [result + [formatter.call(current)], stack]
       end
-
-      [result + [iteration], stack]
-    }.first.compact
+    }.first
   end
 end
