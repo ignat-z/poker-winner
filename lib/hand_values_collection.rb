@@ -27,8 +27,15 @@ class HandValuesCollection
   }
 
   STRAIGHT_FLUSH = ->(hand) {
-    return unless hand.uniq(&:suit).one? && hand.map(&:cost).monotonic_sequence?
-    [hand.map(&:cost).max]
+    return if !FLUSH.call(hand)
+
+    default_cost = hand.map(&:cost)
+    low_ace_cost = default_cost.any? { _1 == HIGH_ACE_RANK } ?
+      default_cost.reject.with_index { |rank, index| index == default_cost.index(HIGH_ACE_RANK) } + [LOW_ACE_RANK] # change only one A to -1
+      : default_cost
+    return if !default_cost.monotonic_sequence? && !low_ace_cost.monotonic_sequence?
+
+    (default_cost.monotonic_sequence? ? default_cost : low_ace_cost).sort.reverse
   }
 
   FOUR_OF_A_KIND = ->(hand) {

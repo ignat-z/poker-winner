@@ -23,8 +23,8 @@ describe HandValuesCollection do
 
     it "returns the top cart if a straight flush" do
       assert_equal(
-        [5],
-        HandValuesCollection::STRAIGHT_FLUSH.call(cards("3d4d5d6d7d"))
+        [3, 2, 1, 0, -1],
+        HandValuesCollection::STRAIGHT_FLUSH.call(cards("3h4h5h2hAh"))
       )
     end
   end
